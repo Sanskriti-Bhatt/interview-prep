@@ -48,18 +48,18 @@ const handleLogin = async (e) => {
       <form onSubmit={handleLogin} >
         <Input 
          value={email}
-         onChange={(target) => setEmail(target.value)}
+         onChange={setEmail}
          label="Email Address"
          placeholder="Enter your email"
          type="text"
-          />
+        />
         <Input 
          value={password}   
-          onChange={(target) => setPassword(target.value)}  
-          label="Password"
-          placeholder="Enter your password"
-          type="password"
-           />
+         onChange={setPassword}  
+         label="Password"
+         placeholder="Enter your password"
+         type="password"
+        />
 
         {error && <p className="text-red-500 text-xs pb-2.5">{error}</p>}
 
