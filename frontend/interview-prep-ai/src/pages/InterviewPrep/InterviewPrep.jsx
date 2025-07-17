@@ -27,15 +27,24 @@ const InterviewPrep = () => {
   const fetchSessionDetailsById = async () => {
     try {
       setIsLoading(true);
+      setErrorMsg("");
       const response = await axiosInstance.get(API_PATHS.SESSION.GET_ONE(sessionId));
-      if (response.data && response.data.session) {
-        setSessionData(response.data.session); 
+      
+      if (response.data && response.data.success && response.data.session) {
+        setSessionData(response.data.session);
+      } else {
+        setErrorMsg("Session data not found");
       }
     } catch (error) {
-      console.log("Error:",error) ;
-    }finally {
-    setIsLoading(false); // Add this
-  }
+      console.log("Error:",error);
+      if (error.response && error.response.status === 404) {
+        setErrorMsg("Session not found");
+      } else {
+        setErrorMsg("Failed to load session data");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Generate Concept Explanation
@@ -91,27 +100,48 @@ const InterviewPrep = () => {
 
     return (
       <DashboardLayout> 
-        <RoleInfoHeader
-        role={sessionData?.role || ""}
-         topicsToFocus={sessionData?.topicsToFocus || ""}
-          experience={sessionData?.experience || "-"}
-          questions={sessionData?.questions?.length || "-"}
-          description={sessionData?.description || ""}
-          lastUpdated={
-            sessionData?.updatedAt
-              ? moment(sessionData.updatedAt).format("Do MMM YYYY")
-              : ""
-               }
-          /> 
+        {isLoading ? (
+          <div className="flex justify-center items-center h-[200px]">
+            <SpinnerLoader />
+          </div>
+        ) : (
+          <RoleInfoHeader
+            role={sessionData?.role || ""}
+            topicsToFocus={sessionData?.topicsToFocus || ""}
+            experience={sessionData?.experience || "-"}
+            questions={sessionData?.questions?.length || "-"}
+            description={sessionData?.description || ""}
+            lastUpdated={
+              sessionData?.updatedAt
+                ? moment(sessionData.updatedAt).format("Do MMM YYYY")
+                : ""
+            }
+          />
+        )}
 
           <div className="container mx-auto pt-4 pb-4 px-4 md:px-0">
             <h2 className="text-lg font-semibold color-black">Interview Q and A</h2>
-            <div className="grid grid-cols-12 gap-4 mt-5 mb-10">
-               <div className={`col-span-12 ${
-                openLeanMoreDrawer ? "md:col-span-7" : "md:col-span-8"
-               }`} >
-                <AnimatePresence>
-                  {sessionData?.questions?.map((data,index) => {
+            
+            {errorMsg && (
+              <div className="my-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded">
+                <p className="flex items-center gap-2">
+                  <LuCircleAlert size={20} />
+                  {errorMsg}
+                </p>
+              </div>
+            )}
+
+            {isLoading ? (
+              <div className="flex justify-center items-center h-[200px]">
+                <SpinnerLoader />
+              </div>
+            ) : (
+              <div className="grid grid-cols-12 gap-4 mt-5 mb-10">
+                <div className={`col-span-12 ${
+                  openLeanMoreDrawer ? "md:col-span-7" : "md:col-span-8"
+                }`} >
+                  <AnimatePresence>
+                    {sessionData?.questions?.map((data,index) => {
                     return (
                       <motion.div
                         key={data._id || index}
@@ -144,8 +174,9 @@ const InterviewPrep = () => {
                     );
                   })}
                 </AnimatePresence>
-               </div>
-            </div>
+                </div>
+              </div>
+            )}
 
             <div>
               <Drawer 

@@ -1,6 +1,12 @@
 // const { GoogleGenAI } = require("@google/genai"); 
 const { conceptExplainPrompt, questionAnswerPrompt } = require("../utils/prompts"); 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+// Check if API key exists
+if (!process.env.GEMINI_API_KEY) {
+  console.error("GEMINI_API_KEY is not set in environment variables");
+}
+
 const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // @desc    Generate interview questions and answers using Gemini
@@ -9,18 +15,13 @@ const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const generateInterviewQuestions = async (req, res) => {
   try {
     const { role , experience , topicsToFocus , numberOfQuestions } = req.body ; 
+    
     if(!role || !experience || !topicsToFocus || !numberOfQuestions ){
         return res.status(400).json({message:"Missing required fields "})  ; 
     }
-    // const prompt = questionAnswerPrompt(role,experience,topicsToFocus,numberOfQuestions) ;;
 
-    // const response = await ai.models.generateContent({
-    //     model:"gemini-2.0-flash-lite" , 
-    //     contents: prompt ,
-    // }) ; 
-    // let rawText = response.text ; 
     const prompt = questionAnswerPrompt(role, experience, topicsToFocus, numberOfQuestions);
-    const model = ai.getGenerativeModel({ model: "gemini-2.0-flash-lite" }); // or gemini-pro, gemini-1.0, etc.
+    const model = ai.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -32,10 +33,22 @@ const generateInterviewQuestions = async (req, res) => {
       .replace(/```$/, "")        // remove ending ```
       .trim();
 
-    const data = JSON.parse(cleanedText);
+    let data;
+    try {
+      data = JSON.parse(cleanedText);
+    } catch (parseError) {
+      console.error("JSON Parse Error:", parseError);
+      console.error("Raw text:", rawText);
+      return res.status(500).json({
+        message: "Failed to parse AI response",
+        error: parseError.message,
+      });
+    }
+    
     res.status(200).json(data);
 
   } catch (error) {
+    console.error("AI Controller Error:", error);
     res.status(500).json({
       message: "Failed to generate questions",
       error: error.message,

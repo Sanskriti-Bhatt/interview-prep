@@ -69,7 +69,7 @@ exports.getSessionById = async (req,res) => {
     const session = await Session.findById(req.params.id)
     .populate({
       path:"questions",
-      options:{ sort:{ isPinned: -1, createAt :1}},
+      options:{ sort:{ isPinned: -1, createdAt: 1}},
     })
     .exec() ; 
 
@@ -79,8 +79,16 @@ exports.getSessionById = async (req,res) => {
         .json({ success:false , message:"Session not found"}) ; 
     }
 
-    res.status(200).json({success:true });
+    // Check if the session belongs to the logged-in user
+    if(session.user.toString() !== req.user.id){
+      return res
+        .status(403)
+        .json({ success: false, message: "Not authorized to access this session" });
+    }
+
+    res.status(200).json({success:true, session });
   }catch(error){
+    console.error("Error in getSessionById:", error);
     res.status(500).json({ success: false , message:"Server Error" }) ;
   }
 };

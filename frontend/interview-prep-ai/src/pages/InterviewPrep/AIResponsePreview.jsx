@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { LuCopy, LuCheck, LuCode } from "react-icons/lu";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
