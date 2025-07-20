@@ -12,6 +12,7 @@ import QuestionCard from '../../components/Cards/QuestionCard';
 import RoleInfoHeader from './RoleInfoHeader';
 import AIResponsePreview from './AIResponsePreview';
 import Drawer from '../../components/Drawer';
+import SkeletonLoader from '../../components/Loader/SkeletonLoader';
 
 const InterviewPrep = () => {
   const { sessionId } = useParams();
@@ -49,13 +50,29 @@ const InterviewPrep = () => {
 
   // Generate Concept Explanation
   const generateConceptExplanation = async (question) => {
-    //try {
-    //   // Placeholder: Replace with your explanation logic
-    //   const explanationData = `Explanation for: ${question}`;
-    //   setExplanation(explanationData);
-    // } catch (error) {
-    //   toast.error("Failed to generate explanation.");
-    // }
+    try {
+      setErrorMsg("") ;
+      setExplanation(null) ;
+
+      setIsLoading(true) ; 
+      setOpenLeanMoreDrawer(true) ; 
+      const response = await axiosInstance.post(
+        API_PATHS.AI.GENERATE_EXPLANATION,
+        {
+          question, 
+        }
+      ) ; 
+
+      if(response.data){
+        setExplanation(response.data)
+      }
+    } catch(error){
+      setExplanation(null) ; 
+      setErrorMsg("Failed to generate explanation, Try again later.") ; 
+      console.log("Error:",error) ; 
+    } finally {
+      setIsLoading(false) ; 
+    }
   };
 
   // Pin Question
@@ -179,7 +196,7 @@ const InterviewPrep = () => {
             )}
 
             <div>
-              <Drawer 
+              <Drawer
               isOpen={openLeanMoreDrawer}
               onClose={() => setOpenLeanMoreDrawer(false)}
               title={!isLoading && explanation?.title}
@@ -189,6 +206,7 @@ const InterviewPrep = () => {
                     <LuCircleAlert className="mt-1" />{errorMsg}
                   </p>
                 )}
+                {isLoading && <SkeletonLoader />}
                 {!isLoading && explanation && (
                   <AIResponsePreview content={explanation?.explanation} />
 

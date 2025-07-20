@@ -79,19 +79,28 @@ const CreateSessionForm = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-8 bg-white rounded-2xl">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <LuRocket className="text-3xl text-white" />
-        </div>
-        <h3 className="text-2xl font-bold text-gray-800 mb-2">
-          Start Your Interview Journey
-        </h3>
-        <p className="text-gray-600">
-          Fill out these details to get personalized interview questions tailored just for you!
-        </p>
-      </div>
+    // <div className="w-full max-w-2xl mx-auto p-8 bg-white rounded-2xl ">
+    //   {/* Header */}
+    //   <div className="text-center mb-8">
+    //     <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+    //       <LuRocket className="text-3xl text-white" />
+    //     </div>
+    //     <h3 className="text-2xl font-bold text-gray-800 mb-2">
+    //       Start Your Interview Journey
+    //     </h3>
+    //     <p className="text-gray-600">
+    //       Fill out these details to get personalized interview questions tailored just for you!
+    //     </p>
+    //   </div>
+    
+     <div className="w-[90vw] md:w-[35vw] p-7 flex flex-col justify-center ">
+      <h3 className="text-lg font-semibold text-black">
+        Start a New Interview Journey
+      </h3>
+
+      <p className="text-xs text-slate-700 mt-[5px] mb-3">
+        Fill out a few quick details and unlock your personalized set of interview questions!
+      </p>
 
       <form onSubmit={handleCreateSession} className="space-y-6">
         {/* Role Input */}
@@ -165,10 +174,11 @@ const CreateSessionForm = () => {
         {/* Submit Button */}
         <button 
           type="submit"
-          className="w-full gradient-primary text-white font-semibold py-4 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          className="btn-primary w-full mt-2"
           disabled={isLoading}
         >
-          {isLoading ? (
+          {isLoading && <SpinnerLoader />} Create Session 
+          {/* {isLoading ? (
             <>
               <SpinnerLoader />
               <span>Creating Your Session...</span>
@@ -178,7 +188,7 @@ const CreateSessionForm = () => {
               <LuRocket className="text-xl" />
               <span>Create Interview Session</span>
             </>
-          )}
+          )} */}
         </button>
 
         {/* Info Text */}

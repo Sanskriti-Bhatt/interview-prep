@@ -74,9 +74,9 @@ const generateConceptExplanation = async (req, res) => {
 
     // let rawText = response.text ; 
 
-       const prompt = conceptExplainPrompt(question);
+    const prompt = conceptExplainPrompt(question);
 
-    const model = ai.getGenerativeModel({ model: "gemini-pro" });
+    const model = ai.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
